@@ -2,6 +2,9 @@ package AccountStates;
 
 import AccountStates.AccountStatesInterfaces.AccountStatable;
 
+/**
+ * Class for approved account state
+ */
 public class ApprovedAccount implements AccountStatable {
     private AccountState accountState;
 

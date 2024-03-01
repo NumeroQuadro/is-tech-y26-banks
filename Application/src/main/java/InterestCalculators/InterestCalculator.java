@@ -2,6 +2,9 @@ package InterestCalculators;
 
 import interfaces.InterestCalculable;
 
+/**
+ * Class for calculating interests
+ */
 public class InterestCalculator implements InterestCalculable {
     private final double lowRateMultiplier;
     private final double mediumRateMultiplier;

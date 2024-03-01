@@ -4,6 +4,9 @@ import InterestManagers.InterstManagersInterfaces.InterestManagable;
 import lombok.Getter;
 import interfaces.InterestCalculable;
 
+/**
+ * Class for managing interests
+ */
 @Getter
 public class InterestManager implements InterestManagable {
     private double accumulatedInterests;

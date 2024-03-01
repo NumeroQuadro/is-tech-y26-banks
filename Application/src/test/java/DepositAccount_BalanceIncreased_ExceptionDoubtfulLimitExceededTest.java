@@ -16,7 +16,7 @@ public class DepositAccount_BalanceIncreased_ExceptionDoubtfulLimitExceededTest 
         clientBuilder.setSurname("Limon");
         clientBuilder.setPhoneNumber("+79213971428");
 
-        var bank = centralBank.CreateBank(1, 1, 2, 3, "Tinkoff");
+        var bank = centralBank.CreateBank(1, 1, 2, 3, "Tinkoff", 234);
         var account = bank.createDepositAccount(clientBuilder.buildClient());
 
         bank.depositMoneyToAccount(1000, account.getAccount().getAccountNumber());

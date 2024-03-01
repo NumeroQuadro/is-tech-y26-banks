@@ -7,8 +7,11 @@ import ProtectedAccounts.ProtectedCreditAccount;
 import ProtectedAccounts.ProtectedDebitAccount;
 import ProtectedAccounts.ProtectedDepositAccount;
 
+/**
+ * Interface for creating protected accounts
+ */
 public interface ProtectedAccountCreatable {
     ProtectedDebitAccount createProtectedDebitAccount(double doubtfulLimit, Client client);
     ProtectedDepositAccount createProtectedDepositAccount(PercentageRateInterests rateInterests, Client client, double doubtfulLimit);
-    ProtectedCreditAccount createProtectedCreditAccount(double doubtfulLimit, Client client);
+    ProtectedCreditAccount createProtectedCreditAccount(double doubtfulLimit, Client client, double initialBalance);
 }

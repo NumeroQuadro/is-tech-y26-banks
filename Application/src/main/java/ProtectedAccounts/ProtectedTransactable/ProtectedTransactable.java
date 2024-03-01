@@ -4,6 +4,9 @@ import ProtectedAccounts.TransactionExceptions.TransactionForbiddenException;
 import Transactions.TransactionModel;
 import interfaces.Transactable;
 
+/**
+ * Interface for protected transactable accounts
+ */
 public interface ProtectedTransactable {
     void provideProtectedDeposit(double amount, String transactionUUID, double commission);
     void provideProtectedWithdraw(double amount, String transactionUUID, double commission) throws TransactionForbiddenException;

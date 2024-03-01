@@ -12,6 +12,9 @@ import Transactions.TransactionTypes;
 import interfaces.InterestCalculable;
 import interfaces.Transactable;
 
+/**
+ * Class for protected deposit account. Protected means there are check for availability to provide transaction
+ */
 public class ProtectedDepositAccount implements ProtectedTransactable {
     private final DepositAccount depositAccount;
     private double doubtfulLimit; // if account sus - limit of money that can be transferred

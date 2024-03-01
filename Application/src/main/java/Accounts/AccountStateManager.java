@@ -4,6 +4,9 @@ import AccountStates.AccountState;
 import AccountStates.AccountStatesInterfaces.AccountStatable;
 import Accounts.Client.Client;
 
+/**
+ * Class for managing account states
+ */
 public class AccountStateManager {
     public void checkAndMoveAccountState(AccountStatable accountState, Client client) {
         if (client.getPassportNumber() == null || client.getEmail() == null) {

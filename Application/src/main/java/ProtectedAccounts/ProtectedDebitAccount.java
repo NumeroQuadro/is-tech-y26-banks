@@ -10,6 +10,9 @@ import Transactions.TransactionModel;
 import Transactions.TransactionTypes;
 import interfaces.Transactable;
 
+/**
+ * Class for protected debit account. Protected means there are check for availability to provide transaction
+ */
 public class ProtectedDebitAccount implements ProtectedTransactable {
     private final DebitAccount debitAccount;
     private final double doubtfulLimit; // if account sus - limit of money that can be transferred

@@ -1,11 +1,10 @@
 package Transactions;
 
-import lombok.Getter;
-
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Stack;
 
+/**
+ * Class for transaction history
+ */
 public class TransactionHistory {
     private final Stack<TransactionModel> transactions = new Stack<>();
 

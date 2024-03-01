@@ -2,6 +2,9 @@ package AccountStates;
 
 import AccountStates.AccountStatesInterfaces.AccountStatable;
 
+/**
+ * Class for suspicious account state
+ */
 public class SuspiciousState implements AccountStatable {
     private AccountState accountState;
 

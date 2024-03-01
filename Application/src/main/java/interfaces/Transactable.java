@@ -5,6 +5,9 @@ import AccountStates.AccountState;
 import Transactions.TransactionHistory;
 import Transactions.TransactionTypes;
 
+/**
+ * Interface for transactable accounts
+ */
 public interface Transactable {
     void depositMoney(double amount, String transactionUUID, double commission);
     void withdrawMoney(double amount, String transactionUUID, double commission);

@@ -13,6 +13,9 @@ import Transactions.TransactionTypes;
 import interfaces.Transactable;
 import lombok.Getter;
 
+/**
+ * Class for managing certain credit account
+ */
 public class CreditAccount implements Transactable {
     @Getter private double currentBalance = 0;
     @Getter private final String accountNumber;
@@ -22,7 +25,8 @@ public class CreditAccount implements Transactable {
     @Getter private final AccountStateManager accountStateManager = new AccountStateManager();
     private final AccountStatable accountState;
 
-    public CreditAccount(String accountNumber, Client client) {
+    public CreditAccount(String accountNumber, Client client, double initialBalance) {
+        this.currentBalance = initialBalance;
         this.accountNumber = accountNumber;
         this.client = client;
         this.accountState = new SuspiciousState();
@@ -110,23 +114,23 @@ public class CreditAccount implements Transactable {
 
     @Override
     public void restoreMemento(AccountMemento memento) throws IllegalArgumentException {
-        if (memento.getAccountNumber().equals(this.accountNumber)) {
-            if (memento.getTransactionType().equals(TransactionTypes.DEPOSIT)) {
-                this.currentBalance -= memento.getAmount();
-                this.currentBalance += memento.getActualCommission();
+        if (memento.accountNumber().equals(this.accountNumber)) {
+            if (memento.transactionType().equals(TransactionTypes.DEPOSIT)) {
+                this.currentBalance -= memento.amount();
+                this.currentBalance += memento.actualCommission();
             }
-            else if (memento.getTransactionType().equals(TransactionTypes.WITHDRAW)) {
-                this.currentBalance += memento.getAmount();
-                this.currentBalance += memento.getActualCommission();
+            else if (memento.transactionType().equals(TransactionTypes.WITHDRAW)) {
+                this.currentBalance += memento.amount();
+                this.currentBalance += memento.actualCommission();
 
             }
-            else if (memento.getTransactionType().equals(TransactionTypes.TRANSFER)) {
-                this.currentBalance += memento.getAmount();
-                this.currentBalance += memento.getActualCommission();
+            else if (memento.transactionType().equals(TransactionTypes.TRANSFER)) {
+                this.currentBalance += memento.amount();
+                this.currentBalance += memento.actualCommission();
             }
 
-            this.client = memento.getClient();
-            this.transactionHistory = memento.getTransactionHistory();
+            this.client = memento.client();
+            this.transactionHistory = memento.transactionHistory();
         }
         else {
             throw new IllegalArgumentException("CreditAccount number mismatch");

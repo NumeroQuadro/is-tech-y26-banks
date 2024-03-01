@@ -19,7 +19,7 @@ public class CreditAccount_DepositToNegativeBalanceAccount_CommissionWasTakenTes
         clientBuilder.setPhoneNumber("+79213971428");
 
         var bank = centralBank.CreateBank(2, 1, 2, 3, "Tinkoff", 239.0);
-        var account = bank.createCreditAccount(clientBuilder.buildClient());
+        var account = bank.createCreditAccount(clientBuilder.buildClient(), 0);
 
         bank.depositMoneyToAccount(1000, account.getAccount().getAccountNumber());
         try {

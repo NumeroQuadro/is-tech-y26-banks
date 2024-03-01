@@ -10,12 +10,15 @@ import Transactions.TransactionModel;
 import Transactions.TransactionTypes;
 import interfaces.Transactable;
 
+/**
+ * Class for protected credit account. Protected means there are check for availability to provide transaction
+ */
 public class ProtectedCreditAccount implements ProtectedTransactable {
     private CreditAccount creditAccount;
     private final double doubtfulLimit; // if account sus - limit of money that can be transferred
 
-    public ProtectedCreditAccount(AccountCreatable factory, double doubtfulLimit, String accountNumber, Client client) {
-        this.creditAccount = factory.createCreditAccount(accountNumber, client);
+    public ProtectedCreditAccount(AccountCreatable factory, double doubtfulLimit, String accountNumber, Client client, double initialBalance) {
+        this.creditAccount = factory.createCreditAccount(accountNumber, client, initialBalance);
         this.doubtfulLimit = doubtfulLimit;
     }
 

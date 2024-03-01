@@ -1,7 +1,6 @@
 package Accounts;
 
 import Accounts.Client.Client;
-import Accounts.Client.ClientBuilder;
 import lombok.Getter;
 import AccountCaretakers.AccountCaretaker;
 import AccountCaretakers.Restorable;
@@ -16,6 +15,9 @@ import Transactions.TransactionTypes;
 import interfaces.InterestCalculable;
 import interfaces.Transactable;
 
+/**
+ * Class for managing certain deposit account
+ */
 public class DepositAccount implements Transactable {
     @Getter private InterestCalculable interestRateCalculator;
     @Getter private double currentBalance = 0;
@@ -119,19 +121,19 @@ public class DepositAccount implements Transactable {
 
     @Override
     public void restoreMemento(AccountMemento memento) {
-        if (memento.getAccountNumber().equals(this.accountNumber)) {
-            if (memento.getTransactionType().equals(TransactionTypes.DEPOSIT)) {
-                this.currentBalance -= memento.getAmount();
+        if (memento.accountNumber().equals(this.accountNumber)) {
+            if (memento.transactionType().equals(TransactionTypes.DEPOSIT)) {
+                this.currentBalance -= memento.amount();
             }
-            else if (memento.getTransactionType().equals(TransactionTypes.WITHDRAW)) {
-                this.currentBalance += memento.getAmount();
+            else if (memento.transactionType().equals(TransactionTypes.WITHDRAW)) {
+                this.currentBalance += memento.amount();
             }
-            else if (memento.getTransactionType().equals(TransactionTypes.TRANSFER)) {
-                this.currentBalance += memento.getAmount();
+            else if (memento.transactionType().equals(TransactionTypes.TRANSFER)) {
+                this.currentBalance += memento.amount();
             }
 
-            this.client = memento.getClient();
-            this.transactionHistory = memento.getTransactionHistory();
+            this.client = memento.client();
+            this.transactionHistory = memento.transactionHistory();
         }
         else {
             throw new IllegalArgumentException("DepositAccount number mismatch");

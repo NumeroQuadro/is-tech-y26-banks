@@ -3,9 +3,13 @@ package Accounts.Client;
 import lombok.Getter;
 import lombok.NonNull;
 
+/**
+ * Model class for the phone number
+ * @param countryCode
+ * @param areaCode
+ * @param subscriberNumber
+ */
 public record PhoneNumberModel(@Getter String countryCode, @Getter String areaCode, @Getter String subscriberNumber) {
-    // TODO: add checkers to redundant + or - in input from user
-
     @Override
     public String toString() {
         return countryCode + areaCode + "-" + subscriberNumber;

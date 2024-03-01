@@ -1,7 +1,6 @@
 package Accounts;
 
 import Accounts.Client.Client;
-import Accounts.Client.ClientBuilder;
 import lombok.Getter;
 import AccountCaretakers.AccountCaretaker;
 import AccountCaretakers.Restorable;
@@ -14,6 +13,9 @@ import Transactions.TransactionModel;
 import Transactions.TransactionTypes;
 import interfaces.Transactable;
 
+/**
+ * Class for managing certain debit account
+ */
 public class DebitAccount implements Transactable {
     @Getter private double currentBalance;
     @Getter private final String accountNumber;
@@ -49,8 +51,6 @@ public class DebitAccount implements Transactable {
             throw new IllegalArgumentException("Withdraw amount must be greater than 0");
         }
 
-        // TODO: implement state pattern to change state from forbidden to allowed to transfer-withdraw operations
-
         if (amount > this.currentBalance) {
             throw new IllegalArgumentException("Withdraw amount must be less than or equal to current balance");
         }
@@ -67,8 +67,6 @@ public class DebitAccount implements Transactable {
         if (amount <= 0) {
             throw new IllegalArgumentException("Transfer amount must be greater than 0");
         }
-
-        // TODO: implement state pattern to change state from forbidden to allowed to transfer-withdraw operations
 
         if (amount > this.currentBalance) {
             throw new IllegalArgumentException("Transfer amount must be less than or equal to current balance");
@@ -108,19 +106,19 @@ public class DebitAccount implements Transactable {
 
     @Override
     public void restoreMemento(AccountMemento memento) throws IllegalArgumentException {
-        if (memento.getAccountNumber().equals(this.accountNumber)) {
-            if (memento.getTransactionType().equals(TransactionTypes.DEPOSIT)) {
-                this.currentBalance -= memento.getAmount();
+        if (memento.accountNumber().equals(this.accountNumber)) {
+            if (memento.transactionType().equals(TransactionTypes.DEPOSIT)) {
+                this.currentBalance -= memento.amount();
             }
-            else if (memento.getTransactionType().equals(TransactionTypes.WITHDRAW)) {
-                this.currentBalance += memento.getAmount();
+            else if (memento.transactionType().equals(TransactionTypes.WITHDRAW)) {
+                this.currentBalance += memento.amount();
             }
-            else if (memento.getTransactionType().equals(TransactionTypes.TRANSFER)) {
-                this.currentBalance += memento.getAmount();
+            else if (memento.transactionType().equals(TransactionTypes.TRANSFER)) {
+                this.currentBalance += memento.amount();
             }
 
-            this.client = memento.getClient();
-            this.transactionHistory = memento.getTransactionHistory();
+            this.client = memento.client();
+            this.transactionHistory = memento.transactionHistory();
         }
         else {
             throw new IllegalArgumentException("DebitAccount number mismatch");

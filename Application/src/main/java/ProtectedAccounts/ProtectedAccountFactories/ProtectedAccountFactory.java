@@ -13,6 +13,9 @@ import interfaces.InterestCalculable;
 
 import java.util.UUID;
 
+/**
+ * Class for creating protected accounts
+ */
 public class ProtectedAccountFactory implements ProtectedAccountCreatable {
 
     @Override
@@ -36,11 +39,11 @@ public class ProtectedAccountFactory implements ProtectedAccountCreatable {
     }
 
     @Override
-    public ProtectedCreditAccount createProtectedCreditAccount(double doubtfulLimit, Client client) {
+    public ProtectedCreditAccount createProtectedCreditAccount(double doubtfulLimit, Client client, double initialBalance) {
         var factory = new AccountFabric();
         UUID uuid = UUID.randomUUID();
         String uuidString = uuid.toString() + "account";
 
-        return new ProtectedCreditAccount(factory, doubtfulLimit, uuidString, client);
+        return new ProtectedCreditAccount(factory, doubtfulLimit, uuidString, client, initialBalance);
     }
 }

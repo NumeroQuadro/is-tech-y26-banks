@@ -9,6 +9,9 @@ import ProtectedAccounts.TransactionExceptions.TransactionForbiddenException;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Central bank class
+ */
 public class CentralBank implements BanksManagable {
     private List<AccountsManagable> banks;
 

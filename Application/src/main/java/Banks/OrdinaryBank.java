@@ -17,6 +17,9 @@ import interfaces.InterestCalculable;
 
 import java.util.*;
 
+/**
+ * Ordinary bank class
+ */
 public class OrdinaryBank implements AccountsManagable {
     ProtectedAccountCreatable accountFactory = new ProtectedAccountFactory();
     private @Getter final String BankName;
@@ -118,9 +121,12 @@ public class OrdinaryBank implements AccountsManagable {
 
     @Override
     public void transferMoneyBetweenBanks(String accountNumberFrom, String recipientBankName, String accountNumberTo, double amount) {
-        // 1. find is there are accountNumberFrom in this bank
-        // 2. call central bank and give it all info to transfer money
-        // TODO: implement transferMoneyBetweenBanks
+        for (ProtectedTransactable account : accounts) {
+            if (account.getAccount().getAccountNumber().equals(accountNumberFrom)) {
+                centralBank.transferMoneyBetweenBanks(account, recipientBankName, accountNumberTo, amount);
+                return;
+            }
+        }
     }
 
     @Override
@@ -151,8 +157,8 @@ public class OrdinaryBank implements AccountsManagable {
     }
 
     @Override
-    public ProtectedTransactable createCreditAccount(Client client) {
-        var account = accountFactory.createProtectedCreditAccount(doubtfulLimit, client);
+    public ProtectedTransactable createCreditAccount(Client client, double initialBalance) {
+        var account = accountFactory.createProtectedCreditAccount(doubtfulLimit, client, initialBalance);
         accounts.add(account);
 
         return account;
