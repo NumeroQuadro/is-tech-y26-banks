@@ -2,9 +2,10 @@ package Transactions;
 
 import lombok.Getter;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Stack;
 
-@Getter
 public class TransactionHistory {
     private final Stack<TransactionModel> transactions = new Stack<>();
 
@@ -16,6 +17,12 @@ public class TransactionHistory {
     }
     public void removeTransactionUUID(String transactionUUID) {
         this.transactions.removeIf(transaction -> transaction.getTransactionUUID().equals(transactionUUID));
+    }
+
+    public Stack<TransactionModel> getTransactions() {
+        var newStack = new Stack<TransactionModel>();
+        newStack.addAll(transactions);
+        return newStack;
     }
 
 

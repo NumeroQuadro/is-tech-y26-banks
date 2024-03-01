@@ -1,7 +1,8 @@
 package Banks.BankFactories;
 
 import Banks.BanksInterfaces.AccountsManagable;
+import Banks.OrdinaryBank;
 
 public interface BankCreatable {
-     AccountsManagable createBank(String bankName);
+     OrdinaryBank createBank(String bankName);
 }

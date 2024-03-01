@@ -31,20 +31,20 @@ public class DebitAccount implements Transactable {
     }
 
     @Override
-    public void depositMoney(double amount, String transactionUUID) {
+    public void depositMoney(double amount, String transactionUUID, double commission) {
         if (amount <= 0) {
             throw new IllegalArgumentException("Deposit amount must be greater than 0");
         }
 
         this.currentBalance += amount;
 
-        var transaction = new TransactionModel(this, null, amount, TransactionTypes.DEPOSIT, transactionUUID);
+        var transaction = new TransactionModel(this, null, amount, TransactionTypes.DEPOSIT, transactionUUID, commission);
 
         transactionHistory.addTransaction(transaction);
     }
 
     @Override
-    public void withdrawMoney(double amount, String transactionUUID) {
+    public void withdrawMoney(double amount, String transactionUUID, double commission) throws IllegalArgumentException{
         if (amount <= 0) {
             throw new IllegalArgumentException("Withdraw amount must be greater than 0");
         }
@@ -57,13 +57,13 @@ public class DebitAccount implements Transactable {
 
         this.currentBalance -= amount;
 
-        var transaction = new TransactionModel(this, null, amount, TransactionTypes.WITHDRAW, transactionUUID);
+        var transaction = new TransactionModel(this, null, amount, TransactionTypes.WITHDRAW, transactionUUID, commission);
 
         transactionHistory.addTransaction(transaction);
     }
 
     @Override
-    public void transferMoney(double amount, Transactable accountToTransferTo, String transactionUUID) {
+    public void transferMoney(double amount, Transactable accountToTransferTo, String transactionUUID, double commission) throws IllegalArgumentException {
         if (amount <= 0) {
             throw new IllegalArgumentException("Transfer amount must be greater than 0");
         }
@@ -76,18 +76,19 @@ public class DebitAccount implements Transactable {
 
         this.currentBalance -= amount;
         try {
-            accountToTransferTo.depositMoney(amount, transactionUUID);
+            accountToTransferTo.depositMoney(amount, transactionUUID, commission);
 
-            var transaction = new TransactionModel(this, accountToTransferTo, amount, TransactionTypes.TRANSFER, transactionUUID);
+            var transaction = new TransactionModel(this, accountToTransferTo, amount, TransactionTypes.TRANSFER, transactionUUID, commission);
             transactionHistory.addTransaction(transaction);
         }
         catch (IllegalArgumentException e) {
             this.currentBalance += amount; // return the money to the account
+            throw e;
         }
     }
 
     @Override
-    public void cancelTransaction(String transactionUUID) {
+    public void cancelTransaction(String transactionUUID) throws IllegalArgumentException{
         try {
             accountCaretaker.restoreAccount(transactionUUID, this);
             transactionHistory.removeTransactionUUID(transactionUUID);
@@ -106,7 +107,7 @@ public class DebitAccount implements Transactable {
     }
 
     @Override
-    public void restoreMemento(AccountMemento memento) {
+    public void restoreMemento(AccountMemento memento) throws IllegalArgumentException {
         if (memento.getAccountNumber().equals(this.accountNumber)) {
             if (memento.getTransactionType().equals(TransactionTypes.DEPOSIT)) {
                 this.currentBalance -= memento.getAmount();
@@ -132,9 +133,10 @@ public class DebitAccount implements Transactable {
     }
 
     @Override
-    public AccountMemento saveMemento(String transactionUUID, TransactionTypes transactionType) {
-        return new AccountMemento(
+    public AccountMemento saveMemento(String transactionUUID, TransactionTypes transactionType, double actualCommission) {
+        var memento =  new AccountMemento(
                 this.currentBalance,
+                actualCommission,
                 this.accountNumber,
                 null,
                 client,
@@ -142,5 +144,8 @@ public class DebitAccount implements Transactable {
                 transactionHistory,
                 transactionType,
                 transactionUUID);
+        accountCaretaker.AddMemento(memento);
+
+        return memento;
     }
 }

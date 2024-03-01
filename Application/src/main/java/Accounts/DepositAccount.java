@@ -20,7 +20,7 @@ public class DepositAccount implements Transactable {
     @Getter private InterestCalculable interestRateCalculator;
     @Getter private double currentBalance = 0;
     @Getter private final String accountNumber;
-    @Getter private InterestManager interestManager;
+    @Getter private final InterestManager interestManager;
     @Getter private Client client;
     @Getter private TransactionHistory transactionHistory = new TransactionHistory();
     @Getter private final Restorable accountCaretaker = new AccountCaretaker();
@@ -37,20 +37,20 @@ public class DepositAccount implements Transactable {
     }
 
     @Override
-    public void depositMoney(double amount, String transactionUUID) {
+    public void depositMoney(double amount, String transactionUUID, double commission) throws IllegalArgumentException {
         if (amount <= 0) {
             throw new IllegalArgumentException("Deposit amount must be greater than 0");
         }
 
         this.currentBalance += amount;
 
-        var transaction = new TransactionModel(this, null, amount, TransactionTypes.DEPOSIT, transactionUUID);
+        var transaction = new TransactionModel(this, null, amount, TransactionTypes.DEPOSIT, transactionUUID, commission);
 
         transactionHistory.addTransaction(transaction);
     }
 
     @Override
-    public void withdrawMoney(double amount, String transactionUUID) {
+    public void withdrawMoney(double amount, String transactionUUID, double commission) throws IllegalArgumentException {
         if (amount <= 0) {
             throw new IllegalArgumentException("Withdraw amount must be greater than 0");
         }
@@ -61,13 +61,13 @@ public class DepositAccount implements Transactable {
 
         this.currentBalance -= amount;
 
-        var transaction = new TransactionModel(this, null, amount, TransactionTypes.WITHDRAW, transactionUUID);
+        var transaction = new TransactionModel(this, null, amount, TransactionTypes.WITHDRAW, transactionUUID, commission);
 
         transactionHistory.addTransaction(transaction);
     }
 
     @Override
-    public void transferMoney(double amount, Transactable accountToTransferTo, String transactionUUID) {
+    public void transferMoney(double amount, Transactable accountToTransferTo, String transactionUUID, double commission) throws IllegalArgumentException {
         if (amount <= 0) {
             throw new IllegalArgumentException("Transfer amount must be greater than 0");
         }
@@ -78,13 +78,14 @@ public class DepositAccount implements Transactable {
 
         this.currentBalance -= amount;
         try {
-            accountToTransferTo.depositMoney(amount, transactionUUID);
+            accountToTransferTo.depositMoney(amount, transactionUUID, commission);
 
-            var transaction = new TransactionModel(this, accountToTransferTo, amount, TransactionTypes.TRANSFER, transactionUUID);
+            var transaction = new TransactionModel(this, accountToTransferTo, amount, TransactionTypes.TRANSFER, transactionUUID, commission);
             transactionHistory.addTransaction(transaction);
         }
         catch (IllegalArgumentException e) {
             this.currentBalance += amount; // return the money to the account
+            throw e;
         }
     }
 
@@ -109,7 +110,7 @@ public class DepositAccount implements Transactable {
         double accumulatedInterests = interestManager.getAccumulatedInterests();
         this.currentBalance += accumulatedInterests;
 
-        var transaction = new TransactionModel(this, null, accumulatedInterests, TransactionTypes.CHARGE, transactionUUID);
+        var transaction = new TransactionModel(this, null, accumulatedInterests, TransactionTypes.CHARGE, transactionUUID, 0);
 
         transactionHistory.addTransaction(transaction);
 
@@ -143,9 +144,10 @@ public class DepositAccount implements Transactable {
     }
 
     @Override
-    public AccountMemento saveMemento(String transactionUUID, TransactionTypes transactionType) {
-        return new AccountMemento(
+    public AccountMemento saveMemento(String transactionUUID, TransactionTypes transactionType, double actualCommission) {
+        var memento =  new AccountMemento(
                 this.currentBalance,
+                actualCommission,
                 this.accountNumber,
                 this.interestManager,
                 this.client,
@@ -153,5 +155,8 @@ public class DepositAccount implements Transactable {
                 transactionHistory,
                 transactionType,
                 transactionUUID);
+        accountCaretaker.AddMemento(memento);
+
+        return memento;
     }
 }

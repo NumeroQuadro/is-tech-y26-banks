@@ -7,6 +7,7 @@ import Accounts.CreditAccount;
 import ProtectedAccounts.ProtectedTransactable.ProtectedTransactable;
 import ProtectedAccounts.TransactionExceptions.TransactionForbiddenException;
 import Transactions.TransactionModel;
+import Transactions.TransactionTypes;
 import interfaces.Transactable;
 
 public class ProtectedCreditAccount implements ProtectedTransactable {
@@ -19,12 +20,13 @@ public class ProtectedCreditAccount implements ProtectedTransactable {
     }
 
     @Override
-    public void provideProtectedDeposit(double amount, String transactionUUID) {
-        this.creditAccount.depositMoney(amount, transactionUUID);
+    public void provideProtectedDeposit(double amount, String transactionUUID, double commission) {
+        this.creditAccount.depositMoney(amount, transactionUUID, commission);
+        this.creditAccount.saveMemento(transactionUUID, TransactionTypes.DEPOSIT, commission);
     }
 
     @Override
-    public void provideProtectedWithdraw(double amount, String transactionUUID) throws TransactionForbiddenException {
+    public void provideProtectedWithdraw(double amount, String transactionUUID, double commission) throws TransactionForbiddenException, IllegalArgumentException {
 
         if (creditAccount.getAccountState().equals(AccountState.SUSPICIOUS)) {
             if (amount > doubtfulLimit) {
@@ -32,18 +34,20 @@ public class ProtectedCreditAccount implements ProtectedTransactable {
             }
         }
 
-        this.creditAccount.withdrawMoney(amount, transactionUUID);
+        this.creditAccount.withdrawMoney(amount, transactionUUID, commission);
+        this.creditAccount.saveMemento(transactionUUID, TransactionTypes.WITHDRAW, commission);
     }
 
     @Override
-    public void provideProtectedTransfer(double amount, Transactable recipientAccount, String transactionUUID) throws TransactionForbiddenException {
+    public void provideProtectedTransfer(double amount, Transactable recipientAccount, String transactionUUID, double commission) throws TransactionForbiddenException, IllegalArgumentException {
         if (creditAccount.getAccountState().equals(AccountState.SUSPICIOUS)) {
             if (amount > doubtfulLimit) {
                 throw new TransactionForbiddenException("Amount is greater than doubtful limit for credit account");
             }
         }
 
-        this.creditAccount.transferMoney(amount, recipientAccount, transactionUUID);
+        this.creditAccount.transferMoney(amount, recipientAccount, transactionUUID, commission);
+        this.creditAccount.saveMemento(transactionUUID, TransactionTypes.TRANSFER, commission);
     }
 
     @Override
@@ -52,7 +56,7 @@ public class ProtectedCreditAccount implements ProtectedTransactable {
     }
 
     @Override
-    public void provideProtectedCancellationTransaction(TransactionModel transactionModel) {
+    public void provideProtectedCancellationTransaction(TransactionModel transactionModel) throws IllegalArgumentException {
         this.creditAccount.cancelTransaction(transactionModel.getTransactionUUID());
     }
 

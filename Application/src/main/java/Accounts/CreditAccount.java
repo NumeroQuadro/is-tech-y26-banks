@@ -4,7 +4,6 @@ import AccountCaretakers.AccountCaretaker;
 import AccountCaretakers.Restorable;
 import AccountMementos.AccountMemento;
 import Accounts.Client.Client;
-import Accounts.Client.ClientBuilder;
 import AccountStates.AccountState;
 import AccountStates.AccountStatesInterfaces.AccountStatable;
 import AccountStates.SuspiciousState;
@@ -31,33 +30,39 @@ public class CreditAccount implements Transactable {
     }
 
     @Override
-    public void depositMoney(double amount, String transactionUUID) throws IllegalArgumentException {
+    public void depositMoney(double amount, String transactionUUID, double commission) throws IllegalArgumentException {
         if (amount <= 0) {
             throw new IllegalArgumentException("Deposit amount must be greater than 0");
         }
 
+        if (this.currentBalance < 0) {
+            this.currentBalance -= commission;
+        }
+
         this.currentBalance += amount;
 
-        var transaction = new TransactionModel(this, null, amount, TransactionTypes.DEPOSIT, transactionUUID);
+        var transaction = new TransactionModel(this, null, amount, TransactionTypes.DEPOSIT, transactionUUID, commission);
         transactionHistory.addTransaction(transaction);
     }
 
     @Override
-    public void withdrawMoney(double amount, String transactionUUID) throws IllegalArgumentException {
+    public void withdrawMoney(double amount, String transactionUUID, double commission) throws IllegalArgumentException {
         if (amount <= 0) {
             throw new IllegalArgumentException("Withdraw amount must be greater than 0");
         } // no check to negative balance because it's a credit account
 
+        if (this.currentBalance < 0) {
+            this.currentBalance -= commission;
+        }
+
         this.currentBalance -= amount;
 
-        var transaction = new TransactionModel(this, null, amount, TransactionTypes.WITHDRAW, transactionUUID);
+        var transaction = new TransactionModel(this, null, amount, TransactionTypes.WITHDRAW, transactionUUID, commission);
         transactionHistory.addTransaction(transaction);
-
-        // TODO: implement commission for negative balance
     }
 
     @Override
-    public void transferMoney(double amount, Transactable accountToTransferTo, String transactionUUID) {
+    public void transferMoney(double amount, Transactable accountToTransferTo, String transactionUUID, double commission) throws IllegalArgumentException {
         if (amount <= 0) {
             throw new IllegalArgumentException("Transfer amount must be greater than 0");
         }
@@ -66,20 +71,26 @@ public class CreditAccount implements Transactable {
             throw new IllegalArgumentException("Transfer amount must be less than or equal to current balance");
         }
 
-        this.currentBalance -= amount;
-        try {
-            accountToTransferTo.depositMoney(amount, transactionUUID);
+        if (this.currentBalance < 0) {
+            this.currentBalance -= commission;
+        }
 
-            var transaction = new TransactionModel(this, accountToTransferTo, amount, TransactionTypes.TRANSFER, transactionUUID);
+        this.currentBalance -= amount;
+
+        try {
+            accountToTransferTo.depositMoney(amount, transactionUUID, commission);
+
+            var transaction = new TransactionModel(this, accountToTransferTo, amount, TransactionTypes.TRANSFER, transactionUUID, commission);
             transactionHistory.addTransaction(transaction);
         }
         catch (IllegalArgumentException e) {
             this.currentBalance += amount; // return the money to the account
+            throw e;
         }
     }
 
     @Override
-    public void cancelTransaction(String transactionUUID) {
+    public void cancelTransaction(String transactionUUID) throws IllegalArgumentException {
         try {
             accountCaretaker.restoreAccount(transactionUUID, this);
             transactionHistory.removeTransactionUUID(transactionUUID);
@@ -98,16 +109,20 @@ public class CreditAccount implements Transactable {
     }
 
     @Override
-    public void restoreMemento(AccountMemento memento) {
+    public void restoreMemento(AccountMemento memento) throws IllegalArgumentException {
         if (memento.getAccountNumber().equals(this.accountNumber)) {
             if (memento.getTransactionType().equals(TransactionTypes.DEPOSIT)) {
                 this.currentBalance -= memento.getAmount();
+                this.currentBalance += memento.getActualCommission();
             }
             else if (memento.getTransactionType().equals(TransactionTypes.WITHDRAW)) {
                 this.currentBalance += memento.getAmount();
+                this.currentBalance += memento.getActualCommission();
+
             }
             else if (memento.getTransactionType().equals(TransactionTypes.TRANSFER)) {
                 this.currentBalance += memento.getAmount();
+                this.currentBalance += memento.getActualCommission();
             }
 
             this.client = memento.getClient();
@@ -124,9 +139,10 @@ public class CreditAccount implements Transactable {
     }
 
     @Override
-    public AccountMemento saveMemento(String transactionUUID, TransactionTypes transactionType) {
-        return new AccountMemento(
+    public AccountMemento saveMemento(String transactionUUID, TransactionTypes transactionType, double actualCommission) {
+        var memento = new AccountMemento(
                 this.currentBalance,
+                actualCommission,
                 this.accountNumber,
                 null,
                 client,
@@ -135,5 +151,8 @@ public class CreditAccount implements Transactable {
                 transactionType,
                 transactionUUID
         );
+        accountCaretaker.AddMemento(memento);
+
+        return memento;
     }
 }

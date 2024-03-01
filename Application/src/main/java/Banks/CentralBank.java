@@ -20,11 +20,11 @@ public class CentralBank implements BanksManagable {
         for (AccountsManagable recipientBank : banks) {
             if (recipientBank.getBankName().equals(recipientBankName)) {
                 try {
-                    from.provideProtectedWithdraw(amount, uuidString);
+                    from.provideProtectedWithdraw(amount, uuidString, recipientBank.getCommission());
 
                     for (ProtectedTransactable accountTo : recipientBank.getAccounts()) {
                         if (accountTo.getAccount().getAccountNumber().equals(accountNumberTo)) {
-                            accountTo.provideProtectedDeposit(amount, uuidString);
+                            accountTo.provideProtectedDeposit(amount, uuidString, recipientBank.getCommission());
                             return;
                         }
                     }
@@ -37,8 +37,8 @@ public class CentralBank implements BanksManagable {
     }
 
     @Override
-    public OrdinaryBank CreateBank(double doubtfulLimit, double highRatePercentage, double middleRatePercentage, double lowRatePercentage, String bankName) {
-        BankFactory bankFactory = new BankFactory(doubtfulLimit, lowRatePercentage, middleRatePercentage, highRatePercentage);
+    public OrdinaryBank CreateBank(double doubtfulLimit, double highRatePercentage, double middleRatePercentage, double lowRatePercentage, String bankName, double commission) {
+        BankFactory bankFactory = new BankFactory(doubtfulLimit, lowRatePercentage, middleRatePercentage, highRatePercentage, commission);
 
         return bankFactory.createBank(bankName);
     }

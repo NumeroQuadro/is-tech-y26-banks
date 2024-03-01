@@ -6,8 +6,11 @@ import interfaces.Transactable;
 import java.util.ArrayList;
 
 public class AccountCaretaker implements Restorable {
-    private ArrayList<AccountMemento> mementos = new ArrayList<>() {
-    };
+    private ArrayList<AccountMemento> mementos = new ArrayList<>();
+
+    public void AddMemento(AccountMemento memento) {
+        mementos.add(memento);
+    }
 
     @Override
     public void restoreAccount(String transactionUUID, Transactable account) {

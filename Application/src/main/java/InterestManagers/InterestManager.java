@@ -13,7 +13,6 @@ public class InterestManager implements InterestManagable {
         this.concreteInterestCalculator = concreteInterestCalculator;
     }
 
-
     @Override
     public double manageInterest(double balance) {
         double interests = concreteInterestCalculator.calculateInterestRate(balance);

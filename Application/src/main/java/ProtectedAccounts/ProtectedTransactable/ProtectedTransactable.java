@@ -5,9 +5,9 @@ import Transactions.TransactionModel;
 import interfaces.Transactable;
 
 public interface ProtectedTransactable {
-    void provideProtectedDeposit(double amount, String transactionUUID);
-    void provideProtectedWithdraw(double amount, String transactionUUID) throws TransactionForbiddenException;
-    void provideProtectedTransfer(double amount, Transactable recipientAccount, String transactionUUID) throws TransactionForbiddenException;
+    void provideProtectedDeposit(double amount, String transactionUUID, double commission);
+    void provideProtectedWithdraw(double amount, String transactionUUID, double commission) throws TransactionForbiddenException;
+    void provideProtectedTransfer(double amount, Transactable recipientAccount, String transactionUUID, double commission) throws TransactionForbiddenException;
     double provideProtectedDailyCalculateInterests();
     void provideProtectedCancellationTransaction(TransactionModel transactionModel);
     double provideProtectedChargingInterests(String transactionUUID);

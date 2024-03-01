@@ -7,6 +7,7 @@ import Accounts.DebitAccount;
 import ProtectedAccounts.ProtectedTransactable.ProtectedTransactable;
 import ProtectedAccounts.TransactionExceptions.TransactionForbiddenException;
 import Transactions.TransactionModel;
+import Transactions.TransactionTypes;
 import interfaces.Transactable;
 
 public class ProtectedDebitAccount implements ProtectedTransactable {
@@ -18,30 +19,33 @@ public class ProtectedDebitAccount implements ProtectedTransactable {
     }
 
     @Override
-    public void provideProtectedDeposit(double amount, String transactionUUID) {
-        debitAccount.depositMoney(amount, transactionUUID);
+    public void provideProtectedDeposit(double amount, String transactionUUID, double commission) {
+        debitAccount.depositMoney(amount, transactionUUID, commission);
+        this.debitAccount.saveMemento(transactionUUID, TransactionTypes.DEPOSIT, commission);
     }
 
     @Override
-    public void provideProtectedWithdraw(double amount, String transactionUUID) throws TransactionForbiddenException {
+    public void provideProtectedWithdraw(double amount, String transactionUUID, double commission) throws TransactionForbiddenException, IllegalArgumentException {
         if (debitAccount.getAccountState().equals(AccountState.SUSPICIOUS)) {
             if (amount > doubtfulLimit) {
                 throw new TransactionForbiddenException("Amount is greater than doubtful limit for debit account");
             }
         }
 
-        this.debitAccount.withdrawMoney(amount, transactionUUID);
+        this.debitAccount.withdrawMoney(amount, transactionUUID, commission);
+        this.debitAccount.saveMemento(transactionUUID, TransactionTypes.WITHDRAW, commission);
     }
 
     @Override
-    public void provideProtectedTransfer(double amount, Transactable recipientAccount, String transactionUUID) throws TransactionForbiddenException {
+    public void provideProtectedTransfer(double amount, Transactable recipientAccount, String transactionUUID, double commission) throws TransactionForbiddenException, IllegalArgumentException {
         if (debitAccount.getAccountState().equals(AccountState.SUSPICIOUS)) {
             if (amount > doubtfulLimit) {
                 throw new TransactionForbiddenException("Amount is greater than doubtful limit for debit account");
             }
         }
 
-        this.debitAccount.transferMoney(amount, recipientAccount, transactionUUID);
+        this.debitAccount.transferMoney(amount, recipientAccount, transactionUUID, commission);
+        this.debitAccount.saveMemento(transactionUUID, TransactionTypes.TRANSFER, commission);
     }
 
     @Override
@@ -50,7 +54,7 @@ public class ProtectedDebitAccount implements ProtectedTransactable {
     }
 
     @Override
-    public void provideProtectedCancellationTransaction(TransactionModel transactionModel) {
+    public void provideProtectedCancellationTransaction(TransactionModel transactionModel) throws IllegalArgumentException {
         this.debitAccount.cancelTransaction(transactionModel.getTransactionUUID());
     }
 

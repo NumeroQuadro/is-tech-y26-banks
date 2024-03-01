@@ -1,11 +1,15 @@
 package Accounts.AccountFactories;
 
 import Accounts.Client.Client;
+import Accounts.Client.ClientBuilder;
 import Accounts.CreditAccount;
 import Accounts.DebitAccount;
 import Accounts.DepositAccount;
 import interfaces.InterestCalculable;
 
+/**
+ * Factory for creating accounts. Implements AccountCreatable interface
+ */
 public class AccountFabric implements AccountCreatable {
 
     @Override

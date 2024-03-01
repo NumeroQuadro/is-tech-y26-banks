@@ -22,18 +22,20 @@ public class OrdinaryBank implements AccountsManagable {
     private @Getter final String BankName;
     private BanksManagable centralBank;
     private @Setter double doubtfulLimit;
+    private @Getter final double commission;
     private final TransactionHistory transactionHistory = new TransactionHistory();
     private final ArrayList<ProtectedTransactable> accounts = new ArrayList<>();
     private final PercentageRateInterests percentageRateInterests;
 
-    public OrdinaryBank(String bankName, double doubtfulLimit, PercentageRateInterests percentageRateInterests) {
+    public OrdinaryBank(String bankName, double doubtfulLimit, double commission, PercentageRateInterests percentageRateInterests) {
         BankName = bankName;
         this.doubtfulLimit = doubtfulLimit;
+        this.commission = commission;
         this.percentageRateInterests = percentageRateInterests;
     }
 
     @Override
-    public void updateDailyChanges(InterestCalculable concreteInterestCalculator) {
+    public void updateDailyChanges() {
         for (ProtectedTransactable account : accounts) {
             account.provideProtectedDailyCalculateInterests();
         }
@@ -46,7 +48,7 @@ public class OrdinaryBank implements AccountsManagable {
             String uuidString = uuid.toString() + "interest";
             double amount = account.provideProtectedChargingInterests(uuidString);
 
-            var transaction = new TransactionModel(account.getAccount(), null, amount, TransactionTypes.CHARGE, uuidString);
+            var transaction = new TransactionModel(account.getAccount(), null, amount, TransactionTypes.CHARGE, uuidString, this.commission);
             this.transactionHistory.addTransaction(transaction);
         }
     }
@@ -63,9 +65,9 @@ public class OrdinaryBank implements AccountsManagable {
 
         for (ProtectedTransactable account : accounts) {
             if (account.getAccount().getAccountNumber().equals(accountNumber)) {
-                account.provideProtectedDeposit(amount, uuidString);
+                account.provideProtectedDeposit(amount, uuidString, this.commission);
 
-                var transaction = new TransactionModel(account.getAccount(), null, amount, TransactionTypes.DEPOSIT, uuid.toString());
+                var transaction = new TransactionModel(account.getAccount(), null, amount, TransactionTypes.DEPOSIT, uuidString, this.commission);
                 transactionHistory.addTransaction(transaction);
                 return;
             }
@@ -80,13 +82,13 @@ public class OrdinaryBank implements AccountsManagable {
         for (ProtectedTransactable account : accounts) {
             if (account.getAccount().getAccountNumber().equals(accountNumber)) {
                 try {
-                    account.provideProtectedWithdraw(amount, uuidString);
+                    account.provideProtectedWithdraw(amount, uuidString, this.commission);
                 }
                 catch (TransactionForbiddenException e) {
                     throw new TransactionForbiddenException("Transaction failed" + e);
                 }
 
-                var transaction = new TransactionModel(account.getAccount(), null, amount, TransactionTypes.WITHDRAW, uuid.toString());
+                var transaction = new TransactionModel(account.getAccount(), null, amount, TransactionTypes.WITHDRAW, uuidString, this.commission);
                 transactionHistory.addTransaction(transaction);
                 return;
             }
@@ -103,9 +105,9 @@ public class OrdinaryBank implements AccountsManagable {
             if (fromAccount.getAccount().getAccountNumber().equals(fromAccountNumber)) {
                 for (ProtectedTransactable toAccount : accounts) {
                     if (toAccount.getAccount().getAccountNumber().equals(toAccountNumber)) {
-                        fromAccount.provideProtectedTransfer(amount, toAccount.getAccount(), uuidString);
+                        fromAccount.provideProtectedTransfer(amount, toAccount.getAccount(), uuidString, this.commission);
 
-                        var transaction = new TransactionModel(fromAccount.getAccount(), toAccount.getAccount(), amount, TransactionTypes.TRANSFER, uuid.toString());
+                        var transaction = new TransactionModel(fromAccount.getAccount(), toAccount.getAccount(), amount, TransactionTypes.TRANSFER, uuidString, this.commission);
                         transactionHistory.addTransaction(transaction);
                         return;
                     }
@@ -122,8 +124,7 @@ public class OrdinaryBank implements AccountsManagable {
     }
 
     @Override
-    public void CancelTransaction(String transactionUUID, String accountNumber) {
-        // TODO: OrdinaryBank should save memento to caretaker after each transaction
+    public void cancelTransaction(String transactionUUID, String accountNumber) {
         Stack<TransactionModel> transactions = transactionHistory.getTransactions();
 
         for (TransactionModel transaction : transactions) {

@@ -8,6 +8,7 @@ import Accounts.DepositAccount;
 import ProtectedAccounts.ProtectedTransactable.ProtectedTransactable;
 import ProtectedAccounts.TransactionExceptions.TransactionForbiddenException;
 import Transactions.TransactionModel;
+import Transactions.TransactionTypes;
 import interfaces.InterestCalculable;
 import interfaces.Transactable;
 
@@ -22,30 +23,33 @@ public class ProtectedDepositAccount implements ProtectedTransactable {
     }
 
     @Override
-    public void provideProtectedDeposit(double amount, String transactionUUID) {
-        this.depositAccount.depositMoney(amount, transactionUUID);
+    public void provideProtectedDeposit(double amount, String transactionUUID, double commission) {
+        this.depositAccount.depositMoney(amount, transactionUUID, commission);
+        this.depositAccount.saveMemento(transactionUUID, TransactionTypes.DEPOSIT, commission);
     }
 
     @Override
-    public void provideProtectedWithdraw(double amount, String transactionUUID) throws TransactionForbiddenException {
+    public void provideProtectedWithdraw(double amount, String transactionUUID, double commission) throws TransactionForbiddenException {
         if (depositAccount.getAccountState().equals(AccountState.SUSPICIOUS)) {
             if (amount > doubtfulLimit) {
                 throw new TransactionForbiddenException("Amount is greater than doubtful limit for deposit account");
             }
         }
 
-        this.depositAccount.withdrawMoney(amount, transactionUUID);
+        this.depositAccount.withdrawMoney(amount, transactionUUID, commission);
+        this.depositAccount.saveMemento(transactionUUID, TransactionTypes.WITHDRAW, commission);
     }
 
     @Override
-    public void provideProtectedTransfer(double amount, Transactable recipientAccount, String transactionUUID) throws TransactionForbiddenException {
+    public void provideProtectedTransfer(double amount, Transactable recipientAccount, String transactionUUID, double commission) throws TransactionForbiddenException {
         if (this.depositAccount.getAccountState().equals(AccountState.SUSPICIOUS)) {
             if (amount > doubtfulLimit) {
                 throw new TransactionForbiddenException("Amount is greater than doubtful limit for deposit account");
             }
         }
 
-        this.depositAccount.transferMoney(amount, recipientAccount, transactionUUID);
+        this.depositAccount.transferMoney(amount, recipientAccount, transactionUUID, commission);
+        this.depositAccount.saveMemento(transactionUUID, TransactionTypes.TRANSFER, commission);
     }
 
     @Override
