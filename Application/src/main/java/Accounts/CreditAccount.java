@@ -4,6 +4,7 @@ import AccountCaretakers.AccountCaretaker;
 import AccountCaretakers.Restorable;
 import AccountMementos.AccountMemento;
 import Accounts.Client.Client;
+import Accounts.Client.ClientBuilder;
 import AccountStates.AccountState;
 import AccountStates.AccountStatesInterfaces.AccountStatable;
 import AccountStates.SuspiciousState;
@@ -19,13 +20,14 @@ public class CreditAccount implements Transactable {
     @Getter private Client client;
     @Getter private TransactionHistory transactionHistory = new TransactionHistory();
     @Getter private final Restorable accountCaretaker = new AccountCaretaker();
+    @Getter private final AccountStateManager accountStateManager = new AccountStateManager();
     private final AccountStatable accountState;
 
     public CreditAccount(String accountNumber, Client client) {
         this.accountNumber = accountNumber;
         this.client = client;
         this.accountState = new SuspiciousState();
-        checkAndChangeAccountState();
+        accountStateManager.checkAndMoveAccountState(accountState, client);
     }
 
     @Override
@@ -133,14 +135,5 @@ public class CreditAccount implements Transactable {
                 transactionType,
                 transactionUUID
         );
-    }
-
-    private void checkAndChangeAccountState() {
-        if (client.getPassportNumber().isEmpty() || client.getEmail().isEmpty()) {
-            accountState.moveToSuspiciousState();
-        }
-        else {
-            accountState.moveToApprovedState();
-        }
     }
 }

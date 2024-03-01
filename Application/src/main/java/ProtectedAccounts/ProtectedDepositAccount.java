@@ -3,6 +3,7 @@ package ProtectedAccounts;
 import AccountStates.AccountState;
 import Accounts.AccountFactories.AccountCreatable;
 import Accounts.Client.Client;
+import Accounts.Client.ClientBuilder;
 import Accounts.DepositAccount;
 import ProtectedAccounts.ProtectedTransactable.ProtectedTransactable;
 import ProtectedAccounts.TransactionExceptions.TransactionForbiddenException;

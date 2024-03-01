@@ -37,7 +37,7 @@ public class CentralBank implements BanksManagable {
     }
 
     @Override
-    public AccountsManagable CreateBank(double doubtfulLimit, double highRatePercentage, double middleRatePercentage, double lowRatePercentage, String bankName) {
+    public OrdinaryBank CreateBank(double doubtfulLimit, double highRatePercentage, double middleRatePercentage, double lowRatePercentage, String bankName) {
         BankFactory bankFactory = new BankFactory(doubtfulLimit, lowRatePercentage, middleRatePercentage, highRatePercentage);
 
         return bankFactory.createBank(bankName);

@@ -1,8 +1,9 @@
 package Banks;
 
+import Accounts.Client.Client;
 import lombok.Getter;
 import lombok.Setter;
-import Accounts.Client.Client;
+import Accounts.Client.ClientBuilder;
 import Banks.BanksInterfaces.AccountsManagable;
 import Banks.BanksInterfaces.BanksManagable;
 import ProtectedAccounts.ProtectedAccountFactories.ProtectedAccountFactoriesInterfaces.ProtectedAccountCreatable;
@@ -72,48 +73,44 @@ public class OrdinaryBank implements AccountsManagable {
     }
 
     @Override
-    public void withdrawMoneyFromAccount(double amount, String accountNumber) {
+    public void withdrawMoneyFromAccount(double amount, String accountNumber) throws TransactionForbiddenException {
         UUID uuid = UUID.randomUUID();
         var uuidString = uuid.toString() + "withdraw";
 
-        try {
-            for (ProtectedTransactable account : accounts) {
-                if (account.getAccount().getAccountNumber().equals(accountNumber)) {
+        for (ProtectedTransactable account : accounts) {
+            if (account.getAccount().getAccountNumber().equals(accountNumber)) {
+                try {
                     account.provideProtectedWithdraw(amount, uuidString);
-
-                    var transaction = new TransactionModel(account.getAccount(), null, amount, TransactionTypes.WITHDRAW, uuid.toString());
-                    transactionHistory.addTransaction(transaction);
-                    return;
                 }
+                catch (TransactionForbiddenException e) {
+                    throw new TransactionForbiddenException("Transaction failed" + e);
+                }
+
+                var transaction = new TransactionModel(account.getAccount(), null, amount, TransactionTypes.WITHDRAW, uuid.toString());
+                transactionHistory.addTransaction(transaction);
+                return;
             }
         }
-        catch(TransactionForbiddenException e) {
-            System.out.println(e.getMessage()); // TODO: log this to client manager
-        }
+
     }
 
     @Override
-    public void transferMoneyBetweenAccounts(double amount, String fromAccountNumber, String toAccountNumber) {
+    public void transferMoneyBetweenAccounts(double amount, String fromAccountNumber, String toAccountNumber) throws TransactionForbiddenException {
         UUID uuid = UUID.randomUUID();
         var uuidString = uuid.toString() + "transfer";
 
-        try {
-            for (ProtectedTransactable fromAccount : accounts) {
-                if (fromAccount.getAccount().getAccountNumber().equals(fromAccountNumber)) {
-                    for (ProtectedTransactable toAccount : accounts) {
-                        if (toAccount.getAccount().getAccountNumber().equals(toAccountNumber)) {
-                            fromAccount.provideProtectedTransfer(amount, toAccount.getAccount(), uuidString);
+        for (ProtectedTransactable fromAccount : accounts) {
+            if (fromAccount.getAccount().getAccountNumber().equals(fromAccountNumber)) {
+                for (ProtectedTransactable toAccount : accounts) {
+                    if (toAccount.getAccount().getAccountNumber().equals(toAccountNumber)) {
+                        fromAccount.provideProtectedTransfer(amount, toAccount.getAccount(), uuidString);
 
-                            var transaction = new TransactionModel(fromAccount.getAccount(), toAccount.getAccount(), amount, TransactionTypes.TRANSFER, uuid.toString());
-                            transactionHistory.addTransaction(transaction);
-                            return;
-                        }
+                        var transaction = new TransactionModel(fromAccount.getAccount(), toAccount.getAccount(), amount, TransactionTypes.TRANSFER, uuid.toString());
+                        transactionHistory.addTransaction(transaction);
+                        return;
                     }
                 }
             }
-        }
-        catch (TransactionForbiddenException e) {
-            System.out.println(e.getMessage()); // TODO: log this to client manager
         }
     }
 
@@ -121,6 +118,7 @@ public class OrdinaryBank implements AccountsManagable {
     public void transferMoneyBetweenBanks(String accountNumberFrom, String recipientBankName, String accountNumberTo, double amount) {
         // 1. find is there are accountNumberFrom in this bank
         // 2. call central bank and give it all info to transfer money
+        // TODO: implement transferMoneyBetweenBanks
     }
 
     @Override

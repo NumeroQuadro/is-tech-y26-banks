@@ -1,6 +1,7 @@
 package Accounts;
 
 import Accounts.Client.Client;
+import Accounts.Client.ClientBuilder;
 import lombok.Getter;
 import AccountCaretakers.AccountCaretaker;
 import AccountCaretakers.Restorable;
@@ -23,6 +24,7 @@ public class DepositAccount implements Transactable {
     @Getter private Client client;
     @Getter private TransactionHistory transactionHistory = new TransactionHistory();
     @Getter private final Restorable accountCaretaker = new AccountCaretaker();
+    @Getter private final AccountStateManager accountStateManager = new AccountStateManager();
     private final AccountStatable accountState;
 
     public DepositAccount(String accountNumber, InterestCalculable interestRateCalculator, Client client) {
@@ -31,7 +33,7 @@ public class DepositAccount implements Transactable {
         this.interestRateCalculator = interestRateCalculator;
         this.client = client;
         this.accountState = new SuspiciousState();
-        checkAndChangeAccountState();
+        this.accountStateManager.checkAndMoveAccountState(accountState, client);
     }
 
     @Override
@@ -151,14 +153,5 @@ public class DepositAccount implements Transactable {
                 transactionHistory,
                 transactionType,
                 transactionUUID);
-    }
-
-    private void checkAndChangeAccountState() {
-        if (client.getPassportNumber().isEmpty() || client.getEmail().isEmpty()) {
-            accountState.moveToSuspiciousState();
-        }
-        else {
-            accountState.moveToApprovedState();
-        }
     }
 }

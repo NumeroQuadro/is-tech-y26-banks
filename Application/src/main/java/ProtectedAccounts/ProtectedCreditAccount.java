@@ -25,6 +25,7 @@ public class ProtectedCreditAccount implements ProtectedTransactable {
 
     @Override
     public void provideProtectedWithdraw(double amount, String transactionUUID) throws TransactionForbiddenException {
+
         if (creditAccount.getAccountState().equals(AccountState.SUSPICIOUS)) {
             if (amount > doubtfulLimit) {
                 throw new TransactionForbiddenException("Amount is greater than doubtful limit for credit account");

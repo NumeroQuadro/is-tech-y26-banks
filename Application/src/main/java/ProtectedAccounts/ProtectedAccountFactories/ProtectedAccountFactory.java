@@ -2,6 +2,7 @@ package ProtectedAccounts.ProtectedAccountFactories;
 
 import Accounts.AccountFactories.AccountFabric;
 import Accounts.Client.Client;
+import Accounts.Client.ClientBuilder;
 import Banks.PercentageRateInterests;
 import InterestCalculators.InterestCalculator;
 import ProtectedAccounts.ProtectedCreditAccount;

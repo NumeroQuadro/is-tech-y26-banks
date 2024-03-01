@@ -1,6 +1,7 @@
 package ProtectedAccounts.ProtectedAccountFactories.ProtectedAccountFactoriesInterfaces;
 
 import Accounts.Client.Client;
+import Accounts.Client.ClientBuilder;
 import Banks.PercentageRateInterests;
 import ProtectedAccounts.ProtectedCreditAccount;
 import ProtectedAccounts.ProtectedDebitAccount;
