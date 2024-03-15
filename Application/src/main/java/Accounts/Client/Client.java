@@ -1,5 +1,6 @@
 package Accounts.Client;
 
+import Banks.PercentageRateInterests;
 import lombok.Getter;
 import lombok.Setter;
 

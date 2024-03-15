@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Central bank class
+ * Central bank class which manages all banks and provides methods for money transfer between banks
  */
 public class CentralBank implements BanksManagable {
     private List<AccountsManagable> banks;

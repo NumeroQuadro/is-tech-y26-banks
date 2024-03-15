@@ -4,6 +4,7 @@ import AccountStates.AccountState;
 import Accounts.AccountFactories.AccountCreatable;
 import Accounts.Client.Client;
 import Accounts.CreditAccount;
+import Banks.PercentageRateInterests;
 import ProtectedAccounts.ProtectedTransactable.ProtectedTransactable;
 import ProtectedAccounts.TransactionExceptions.TransactionForbiddenException;
 import Transactions.TransactionModel;
@@ -66,6 +67,11 @@ public class ProtectedCreditAccount implements ProtectedTransactable {
     @Override
     public double provideProtectedChargingInterests(String transactionUUID) {
         return this.creditAccount.chargeInterests(transactionUUID);
+    }
+
+    @Override
+    public void provideProtectedUpdateAccountSettings(PercentageRateInterests rateInterests) {
+        this.creditAccount.updateAccountSettings(rateInterests);
     }
 
     @Override

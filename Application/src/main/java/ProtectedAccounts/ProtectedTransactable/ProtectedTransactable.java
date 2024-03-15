@@ -1,5 +1,6 @@
 package ProtectedAccounts.ProtectedTransactable;
 
+import Banks.PercentageRateInterests;
 import ProtectedAccounts.TransactionExceptions.TransactionForbiddenException;
 import Transactions.TransactionModel;
 import interfaces.Transactable;
@@ -14,5 +15,6 @@ public interface ProtectedTransactable {
     double provideProtectedDailyCalculateInterests();
     void provideProtectedCancellationTransaction(TransactionModel transactionModel);
     double provideProtectedChargingInterests(String transactionUUID);
+    void provideProtectedUpdateAccountSettings(PercentageRateInterests rateInterests);
     Transactable getAccount();
 }

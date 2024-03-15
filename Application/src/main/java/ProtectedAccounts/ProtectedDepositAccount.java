@@ -5,6 +5,7 @@ import Accounts.AccountFactories.AccountCreatable;
 import Accounts.Client.Client;
 import Accounts.Client.ClientBuilder;
 import Accounts.DepositAccount;
+import Banks.PercentageRateInterests;
 import ProtectedAccounts.ProtectedTransactable.ProtectedTransactable;
 import ProtectedAccounts.TransactionExceptions.TransactionForbiddenException;
 import Transactions.TransactionModel;
@@ -68,6 +69,11 @@ public class ProtectedDepositAccount implements ProtectedTransactable {
     @Override
     public double provideProtectedChargingInterests(String transactionUUID) {
         return this.depositAccount.chargeInterests(transactionUUID);
+    }
+
+    @Override
+    public void provideProtectedUpdateAccountSettings(PercentageRateInterests rateInterests) {
+        this.depositAccount.updateAccountSettings(rateInterests);
     }
 
     @Override

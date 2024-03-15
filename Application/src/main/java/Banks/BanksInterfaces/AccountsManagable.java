@@ -1,6 +1,7 @@
 package Banks.BanksInterfaces;
 
 import Accounts.Client.Client;
+import Banks.PercentageRateInterests;
 import ProtectedAccounts.ProtectedTransactable.ProtectedTransactable;
 import ProtectedAccounts.TransactionExceptions.TransactionForbiddenException;
 
@@ -16,6 +17,7 @@ public interface AccountsManagable {
     void transferMoneyBetweenBanks(String accountNumberFrom, String recipientBankName, String accountNumberTo, double amount);
     void cancelTransaction(String transactionUUID, String accountNumber);
     void updateDailyChanges();
+    void updateAccountSettings(PercentageRateInterests rateInterests, String accountNumber);
     void chargeInterests();
     String getBankName();
     double getCommission();

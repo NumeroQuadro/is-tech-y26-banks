@@ -1,6 +1,7 @@
 package Banks;
 
 import Accounts.Client.Client;
+import InterestCalculators.InterestCalculator;
 import lombok.Getter;
 import lombok.Setter;
 import Accounts.Client.ClientBuilder;
@@ -41,6 +42,17 @@ public class OrdinaryBank implements AccountsManagable {
     public void updateDailyChanges() {
         for (ProtectedTransactable account : accounts) {
             account.provideProtectedDailyCalculateInterests();
+        }
+    }
+
+    @Override
+    public void updateAccountSettings(PercentageRateInterests rateInterests, String accountNumber) {
+        for (ProtectedTransactable account : accounts) {
+            if (account.getAccount().getAccountNumber().equals(accountNumber)) {
+                InterestCalculable calculator = new InterestCalculator(rateInterests.lowPercentageRate(), rateInterests.getMediumPercentageRate(), rateInterests.getHighPercentageRate());
+                account.provideProtectedUpdateAccountSettings(rateInterests);
+                return;
+            }
         }
     }
 

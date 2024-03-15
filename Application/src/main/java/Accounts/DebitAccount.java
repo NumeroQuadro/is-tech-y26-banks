@@ -1,6 +1,8 @@
 package Accounts;
 
 import Accounts.Client.Client;
+import Accounts.Client.ClientNotifyManager;
+import Banks.PercentageRateInterests;
 import lombok.Getter;
 import AccountCaretakers.AccountCaretaker;
 import AccountCaretakers.Restorable;
@@ -23,6 +25,7 @@ public class DebitAccount implements Transactable {
     @Getter private TransactionHistory transactionHistory = new TransactionHistory();
     @Getter private final Restorable accountCaretaker = new AccountCaretaker();
     @Getter private final AccountStateManager accountStateManager = new AccountStateManager();
+    private final ClientNotifyManager clientNotifyManager;
     private final AccountStatable accountState;
 
     public DebitAccount(String accountNumber, Client client) {
@@ -30,6 +33,7 @@ public class DebitAccount implements Transactable {
         this.client = client;
         this.accountState = new SuspiciousState();
         accountStateManager.checkAndMoveAccountState(accountState, client);
+        this.clientNotifyManager = new ClientNotifyManager(client);
     }
 
     @Override
@@ -83,6 +87,11 @@ public class DebitAccount implements Transactable {
             this.currentBalance += amount; // return the money to the account
             throw e;
         }
+    }
+
+    @Override
+    public void updateAccountSettings(PercentageRateInterests rateInterests) {
+        this.clientNotifyManager.notifyClient(rateInterests, accountNumber);
     }
 
     @Override

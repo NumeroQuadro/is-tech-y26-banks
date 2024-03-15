@@ -1,6 +1,8 @@
 package Accounts;
 
 import Accounts.Client.Client;
+import Accounts.Client.ClientNotifyManager;
+import Banks.PercentageRateInterests;
 import lombok.Getter;
 import AccountCaretakers.AccountCaretaker;
 import AccountCaretakers.Restorable;
@@ -27,6 +29,7 @@ public class DepositAccount implements Transactable {
     @Getter private TransactionHistory transactionHistory = new TransactionHistory();
     @Getter private final Restorable accountCaretaker = new AccountCaretaker();
     @Getter private final AccountStateManager accountStateManager = new AccountStateManager();
+    private final ClientNotifyManager clientNotifyManager;
     private final AccountStatable accountState;
 
     public DepositAccount(String accountNumber, InterestCalculable interestRateCalculator, Client client) {
@@ -34,6 +37,7 @@ public class DepositAccount implements Transactable {
         this.interestManager = new InterestManager(interestRateCalculator);
         this.interestRateCalculator = interestRateCalculator;
         this.client = client;
+        this.clientNotifyManager = new ClientNotifyManager(client);
         this.accountState = new SuspiciousState();
         this.accountStateManager.checkAndMoveAccountState(accountState, client);
     }
@@ -89,6 +93,11 @@ public class DepositAccount implements Transactable {
             this.currentBalance += amount; // return the money to the account
             throw e;
         }
+    }
+
+    @Override
+    public void updateAccountSettings(PercentageRateInterests rateInterests) {
+        this.clientNotifyManager.notifyClient(rateInterests, accountNumber);
     }
 
     @Override
